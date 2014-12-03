@@ -236,9 +236,11 @@ Json::Value obj_value(Json::objectValue); // {}
 #endif
   Value(bool value);
   Value(const Value& other);
+  Value(Value&& other);
   ~Value();
 
-  Value& operator=(Value other);
+  Value& operator=(const Value& other);
+  Value& operator=(Value&& other);
   /// Swap values.
   /// \note Currently, comments are intentionally not swapped, for
   /// both logic and efficiency.
