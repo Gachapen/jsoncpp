@@ -1499,6 +1499,25 @@ JSONTEST_FIXTURE(ValueTest, offsetAccessors) {
   JSONTEST_ASSERT(y.getOffsetLimit() == 0);
 }
 
+JSONTEST_FIXTURE(ValueTest, move) {
+  Json::Value x;
+  x["string"] = "string_value";
+  x["object"]["member"] = 1;
+  x["array"].append(2);
+
+  Json::Value y(std::move(x));
+
+  JSONTEST_ASSERT(y["string"].isString());
+  JSONTEST_ASSERT(y["object"].isObject());
+  JSONTEST_ASSERT(y["object"]["member"].isInt());
+  JSONTEST_ASSERT(y["array"].isArray());
+  JSONTEST_ASSERT(y["array"].size() == 1);
+  JSONTEST_ASSERT(x.isNull());
+  JSONTEST_ASSERT(x["string"].isNull());
+  JSONTEST_ASSERT(x["object"].isNull());
+  JSONTEST_ASSERT(x["array"].isNull());
+}
+
 struct WriterTest : JsonTest::TestCase {};
 
 JSONTEST_FIXTURE(WriterTest, dropNullPlaceholders) {
@@ -1623,6 +1642,7 @@ int main(int argc, const char* argv[]) {
   JSONTEST_REGISTER_FIXTURE(runner, ValueTest, compareType);
   JSONTEST_REGISTER_FIXTURE(runner, ValueTest, offsetAccessors);
   JSONTEST_REGISTER_FIXTURE(runner, ValueTest, typeChecksThrowExceptions);
+  JSONTEST_REGISTER_FIXTURE(runner, ValueTest, move);
 
   JSONTEST_REGISTER_FIXTURE(runner, ReaderTest, parseWithNoErrors);
   JSONTEST_REGISTER_FIXTURE(

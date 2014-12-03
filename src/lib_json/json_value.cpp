@@ -372,6 +372,20 @@ Value::Value(const Value& other)
   }
 }
 
+Value::Value(Value&& other)
+    : value_(other.value_), type_(other.type_), allocated_(false)
+#ifdef JSON_VALUE_USE_INTERNAL_MAP
+      ,
+      itemIsUsed_(other.itemIsUsed_)
+#endif
+      ,
+      comments_(other.comments_), start_(other.start_), limit_(other.limit_) {
+  other.type_ = nullValue;
+  other.allocated_ = false;
+  other.start_ = 0;
+  other.limit_ = 0;
+}
+
 Value::~Value() {
   switch (type_) {
   case nullValue:
@@ -405,8 +419,22 @@ Value::~Value() {
     delete[] comments_;
 }
 
-Value& Value::operator=(Value other) {
-  swap(other);
+Value& Value::operator=(const Value& other) {
+  Value tmp(other);
+  swap(tmp);
+  return *this;
+}
+
+Value& Value::operator=(Value&& other) {
+  type_ = other.type_;
+  value_ = std::move(other.value_);
+  allocated_ = other.allocated_;
+  start_ = other.start_;
+  limit_ = other.limit_;
+  other.type_ = nullValue;
+  other.allocated_ = false;
+  other.start_ = 0;
+  other.limit_ = 0;
   return *this;
 }
 
